@@ -3,8 +3,10 @@ import { db } from "./db.ts";
 import { actorsFor } from "./clickhouse.ts";
 import { profiles, orgDomain, domainOf } from "./github.ts";
 import { qualify, isFreemail, emailInText, websiteMatchesCompany, HOSTING_DOMAIN, isMaintainer } from "./qualify.ts";
-import { provider, type Hit, type Found } from "./providers/index.ts";
+import { provider, type Hit, type Found, type Firmographics } from "./providers/index.ts";
 import { judge, compose, explain, type PersonState } from "./rank.ts";
+import { companyKey, verifiedCompany, icpFit, type Icp } from "./icp.ts";
+import { scoreActivity } from "./activity.ts";
 
 export const chunk = <T>(xs: T[], n: number) => Array.from({ length: Math.ceil(xs.length / n) }, (_, i) => xs.slice(i * n, i * n + n));
 
@@ -41,7 +43,7 @@ export async function fetchProfilesStep(logins: string[]) {
     if (!company_domain && site && !HOSTING_DOMAIN.test(site) && websiteMatchesCompany(site, company_norm)) company_domain = site;
     const q = qualify({ ...p, repos: prev.repos, signals: prev.signals, company_domain });
     const maintainer = isMaintainer({ company: p.company, bio: p.bio, repos: prev.repos, signals: prev.signals });
-    rows.push({ ...p, ...q, company_domain, maintainer, fetched_at: new Date().toISOString() });
+    rows.push({ ...p, ...q, company_domain, company_key: companyKey(q.company_norm, company_domain), maintainer, fetched_at: new Date().toISOString() });
   }
   if (rows.length) {
     const { error: e2 } = await db.from("people").upsert(rows, { onConflict: "login" });
@@ -74,11 +76,39 @@ export async function rankStep(logins: string[], concurrency = 8) {
   return { ranked: rows.length };
 }
 
-/** Qualified, ranked, non-maintainer people with no contacts row, best rank first. Only these get paid enrichment. */
-export async function enrichCandidates(minRank: number, limit: number): Promise<string[]> {
-  const { data, error } = await db
-    .from("people_to_enrich").select("login").gte("rank", minRank).or("maintainer.is.null,maintainer.eq.false")
-    .order("rank", { ascending: false }).order("score", { ascending: false }).limit(limit);
+/**
+ * Spend cap + ledger for one run. `paid` skips the call when the run is at the cap, records cost on the
+ * provider's idempotency key (a replay never adds a second row), and returns the values on a hit.
+ * Caller guarantees one `paid` at a time per runId (the cap check is read-then-write). `subject` is a login or a company key.
+ */
+function ledger(runId: string, subject: string, maxUsd: number) {
+  const tools: string[] = [];
+  const overCap = async () => {
+    const { data, error } = await db.rpc("run_spend", { rid: runId });
+    if (error) throw new Error(`run_spend: ${error.message}`);
+    return Number(data) >= maxUsd;
+  };
+  const paid = async <T>(fn: (scope: string) => Promise<Hit<T>>): Promise<T | null> => {
+    if (await overCap()) return null;
+    const r = await fn(`${runId}:${subject}`);
+    tools.push(r.tool);
+    if (r.usd > 0) await db.from("spend").upsert({ run_id: runId, login: subject, tool: r.tool, usd: r.usd, key: r.key }, { onConflict: "key", ignoreDuplicates: true });
+    return r.ok ? r.values : null;
+  };
+  /** true when nothing ran because the cap was already reached */
+  const skippedForCap = async () => tools.length === 0 && maxUsd > 0 && (await overCap());
+  return { tools, overCap, paid, skippedForCap };
+}
+
+/**
+ * Qualified, ranked, non-maintainer people with no contacts row, best rank first. Only these get paid enrichment.
+ * `requireIcp` (set when an ICP file is given) narrows to people whose company passed the ICP gate.
+ */
+export async function enrichCandidates(minRank: number, limit: number, requireIcp = false): Promise<string[]> {
+  let q = db
+    .from("people_to_enrich").select("login").gte("rank", minRank).or("maintainer.is.null,maintainer.eq.false");
+  if (requireIcp) q = q.eq("icp_fit", true);
+  const { data, error } = await q.order("rank", { ascending: false }).order("score", { ascending: false }).limit(limit);
   if (error) throw new Error(`people_to_enrich: ${error.message}`);
   return (data ?? []).map((r) => r.login);
 }
@@ -96,26 +126,13 @@ export async function enrichPersonStep(
   const { data: p, error } = await db.from("people").select("login,name,company_norm,company_domain,linkedin,github_email").eq("login", login).single<Person>();
   if (error || !p) throw new Error(`people ${login}: ${error?.message}`);
 
-  const tools: string[] = [];
+  const { tools, paid, skippedForCap } = ledger(runId, login, maxUsd);
   const found: Found = { linkedin: p.linkedin, company: p.company_norm, company_domain: p.company_domain };
   let emailSource = "none";
   const [first_name, ...rest] = (p.name ?? "").trim().split(/\s+/);
   found.first_name = first_name || null;
   found.last_name = rest.join(" ") || null;
 
-  const overCap = async () => {
-    const { data, error } = await db.rpc("run_spend", { rid: runId });
-    if (error) throw new Error(`run_spend: ${error.message}`);
-    return Number(data) >= maxUsd;
-  };
-  const paid = async (fn: (scope: string) => Promise<Hit>) => {
-    if (await overCap()) return null;
-    const r = await fn(`${runId}:${login}`);
-    tools.push(r.tool);
-    // keyed on the provider's idempotency key: a replayed call never adds a second ledger row
-    if (r.usd > 0) await db.from("spend").upsert({ run_id: runId, login, tool: r.tool, usd: r.usd, key: r.key }, { onConflict: "key", ignoreDuplicates: true });
-    return r.ok ? r.values : null;
-  };
   const setEmail = (email: unknown, source: string) => {
     if (typeof email === "string" && email.includes("@") && !found.email) { found.email = email; emailSource = source; }
   };
@@ -156,7 +173,7 @@ export async function enrichPersonStep(
 
   // 5. freemail GitHub email: kept, flagged
   if (!found.email && p.github_email) setEmail(p.github_email, "github_profile_personal");
-  if (emailSource === "none" && tools.length === 0 && maxUsd > 0 && (await overCap())) emailSource = "skipped_cap";
+  if (emailSource === "none" && (await skippedForCap())) emailSource = "skipped_cap";
 
   // a "verified" email at a different domain than the company usually means an old employer or a side project
   const emailDomain = domainOf(found.email ?? null);
@@ -170,4 +187,92 @@ export async function enrichPersonStep(
   const { error: e2 } = await db.from("contacts").upsert(row, { onConflict: "login" });
   if (e2) throw new Error(`contacts upsert: ${e2.message}`);
   return { login, email_source: emailSource, tools };
+}
+
+// ---- ICP gate (company level) --------------------------------------------------------------------
+
+export type CompanyRef = { key: string; name: string | null; domain: string | null };
+
+/** Companies behind qualified, non-maintainer people that have no verdict yet (all of them with `force`). */
+export async function icpCandidates(force = false): Promise<CompanyRef[]> {
+  const { data, error } = await db.from("people").select("company_key,company_norm,company_domain")
+    .eq("qualified", true).or("maintainer.is.null,maintainer.eq.false").not("company_key", "is", null).limit(10000);
+  if (error) throw new Error(`people select: ${error.message}`);
+  const byKey = new Map<string, CompanyRef>();
+  for (const r of data ?? []) {
+    const c = byKey.get(r.company_key) ?? { key: r.company_key, name: null, domain: null };
+    c.name ??= r.company_norm; c.domain ??= r.company_domain;
+    byKey.set(r.company_key, c);
+  }
+  if (!force) {
+    const { data: done, error: e2 } = await db.from("companies").select("key").not("checked_at", "is", null).limit(10000);
+    if (e2) throw new Error(`companies select: ${e2.message}`);
+    for (const r of done ?? []) byKey.delete(r.key);
+  }
+  return [...byKey.values()];
+}
+
+/**
+ * One company: provider lookup → verify it's the right company → ICP verdict → companies row, then
+ * people.icp_fit for everyone at that company. A verified LinkedIn website also fills missing company_domain.
+ * Unknown stays null (held, not dropped). Nothing is written when the run is already at the cap.
+ */
+export async function icpStep({ key, name, domain, runId, maxUsd, icp }: CompanyRef & { runId: string; maxUsd: number; icp: Icp }) {
+  const L = ledger(runId, key, maxUsd);
+  let v: Firmographics | null = null, failure: string | null = null;
+  try {
+    v = await L.paid((scope) => provider.companyFirmographics({ name, domain }, scope));
+  } catch (e) {
+    // one bad lookup (e.g. provider 422 on odd search text) must not abort the batch; recorded, re-tried with --force
+    failure = `error: ${(e as Error).message}`.slice(0, 200);
+  }
+  if (!v && !failure && (await L.skippedForCap())) return { key, fit: null as boolean | null, reason: "skipped_cap" };
+
+  let fit: boolean | null = null, reason = failure ?? "not found";
+  let row: Record<string, unknown> = { key, name, domain, icp_fit: null, icp_reason: reason, source: L.tools.at(-1) ?? null, checked_at: new Date().toISOString() };
+  if (v) {
+    const got = { ...v, domain: domainOf(v.domain) };
+    const verified = verifiedCompany(got, { name, domain });
+    ({ fit, reason } = verified ? icpFit(got, icp) : { fit: null, reason: `company mismatch: got "${got.name ?? ""}" ${got.domain ?? ""}` });
+    // keep our own name/domain on a mismatch; the returned company is in icp_reason
+    row = { ...row, name: verified ? got.name ?? name : name, domain: domain ?? (verified ? got.domain : null), linkedin: verified ? got.linkedin : null,
+      employees: got.employees, employees_min: got.employees_min, employees_max: got.employees_max,
+      hq_country: got.hq_country, industry: got.industry, icp_fit: fit, icp_reason: reason };
+    if (verified && !domain && got.domain) {
+      const { error } = await db.from("people").update({ company_domain: got.domain }).eq("company_key", key).is("company_domain", null);
+      if (error) throw new Error(`people domain fill: ${error.message}`);
+    }
+  }
+  const { error } = await db.from("companies").upsert(row, { onConflict: "key" });
+  if (error) throw new Error(`companies upsert: ${error.message}`);
+  const { error: e2 } = await db.from("people").update({ icp_fit: fit }).eq("company_key", key);
+  if (e2) throw new Error(`people icp_fit: ${e2.message}`);
+  return { key, fit, reason };
+}
+
+// ---- LinkedIn activity (before LinkedIn outreach) ---------------------------------------------------
+
+/** linkedin-channel people (profile URL + company domain, no email) not yet checked, best rank first. */
+export async function activityCandidates(minRank: number, limit: number, requireIcp = false): Promise<{ login: string; linkedin: string }[]> {
+  let q = db.from("outreach_queue").select("login,linkedin").eq("channel", "linkedin").gte("rank", minRank).is("activity_status", null);
+  if (requireIcp) q = q.eq("icp_fit", true);
+  const { data, error } = await q.order("rank", { ascending: false }).limit(limit);
+  if (error) throw new Error(`outreach_queue: ${error.message}`);
+  return (data ?? []) as { login: string; linkedin: string }[];
+}
+
+/** Posts/comments/reactions → score → linkedin_activity row. Skipped (no row) when the run is at the cap. */
+export async function activityStep({ login, linkedin, runId, maxUsd }: { login: string; linkedin: string; runId: string; maxUsd: number }) {
+  const L = ledger(runId, login, maxUsd);
+  const v = await L.paid((scope) => provider.linkedinActivity({ linkedin }, scope));
+  if (!v) {
+    if (await L.skippedForCap()) return { login, activity_status: "skipped_cap", outreach_ready: false };
+    const { error } = await db.from("linkedin_activity").upsert({ login, linkedin, activity_status: "inactive", activity_level: "minimal", outreach_ready: false, reason: "profile not readable", checked_at: new Date().toISOString() }, { onConflict: "login" });
+    if (error) throw new Error(`linkedin_activity upsert: ${error.message}`);
+    return { login, activity_status: "inactive", outreach_ready: false };
+  }
+  const s = scoreActivity(v);
+  const { error } = await db.from("linkedin_activity").upsert({ login, linkedin, ...s, checked_at: new Date().toISOString() }, { onConflict: "login" });
+  if (error) throw new Error(`linkedin_activity upsert: ${error.message}`);
+  return { login, activity_status: s.activity_status, outreach_ready: s.outreach_ready };
 }

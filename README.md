@@ -98,6 +98,23 @@ npx tsx scripts/run.ts report                         # funnel + top 20 with rea
 npx tsx scripts/run.ts enrich --run-id pilot --max-usd 10 --min-rank 55 --limit 50
 ```
 
+With an ICP (optional, company-level gate before paid enrichment):
+
+```bash
+# client-profile.yaml is what the icp-onboarding skill writes; only icp_hard_filters.headcount_min/max and .countries are read
+npx tsx scripts/run.ts icp --icp ~/path/client-profile.yaml --run-id icp1 --max-usd 1   # headcount + HQ per company, $0.003 each
+npx tsx scripts/run.ts enrich --icp ~/path/client-profile.yaml --run-id pilot --max-usd 10 --min-rank 55
+npx tsx scripts/run.ts activity --icp ~/path/client-profile.yaml --run-id act1 --max-usd 1 --min-rank 40  # LinkedIn activity, ~$0.01/profile
+```
+
+`icp` looks each company up once (LinkedIn company page via your provider), checks it is the right
+company (domain match, or exact name when no domain was known), and writes `icp_fit` true/false/null.
+Null means "couldn't tell" and is held, not dropped; `companies.icp_reason` says why. With `--icp`,
+`enrich` and `activity` only take people whose company passed. Without it, nothing changes.
+
+`activity` runs for people on the `linkedin` channel (profile URL, no email):
+posts, comments and reactions → `active` (≤30 days), `stale` (31–90), `inactive`, plus `outreach_ready`.
+
 Useful extras:
 
 ```bash
@@ -117,12 +134,14 @@ npx trigger.dev@latest login     # then put your project ref in trigger.config.t
 npx trigger.dev dev
 ```
 
-Tasks `fetch-actors` `{ "days": 365 }`, `rank-people` `{ }`, `enrich-batch` `{ "runId": "pilot", "minRank": 55, "maxUsd": 50 }`.
-They call the same functions as the CLI.
+Tasks `fetch-actors` `{ "days": 365 }`, `rank-people` `{ }`, `enrich-batch` `{ "runId": "pilot", "minRank": 55, "maxUsd": 50 }`,
+`icp-batch` `{ "runId": "icp1", "maxUsd": 1, "icp": { "headcount_min": 100, "headcount_max": 5000, "countries": ["US", "CA"] } }`,
+`activity-batch` `{ "runId": "act1", "maxUsd": 1, "requireIcp": true }`. They call the same functions as the CLI.
 
 ## Bring your own enrichment provider
 
-The pipeline asks a provider for three things, defined in `src/lib/providers/types.ts`:
+The pipeline asks a provider for five things, defined in `src/lib/providers/types.ts` (the last two
+only matter if you use the ICP gate and the LinkedIn activity check):
 
 | call | input | returns |
 |---|---|---|
@@ -156,7 +175,13 @@ Raw AI judgments are stored per person, so changing weights only needs `rank --f
   `person_enrich`, `none`, `skipped_cap`.
 - `contacts.email_domain_match`: `false` usually means a previous employer or a side project. Expect
   the odd false alarm (dell.com vs delltechnologies.com).
-- `spend`: every paid call with its cost, per run.
+- `spend`: every paid call with its cost, per run (`login` holds the company key for company lookups).
+- `people.icp_fit` / `companies`: the ICP verdict per company with `employees`, `hq_country`, `icp_reason`.
+- `outreach_queue` (view): one row per qualified non-vendor person with `channel` = `email` | `linkedin` (profile URL, no email) | `none`,
+  plus `icp_fit`, `activity_status` and `outreach_ready`. Filter `channel = 'linkedin' and outreach_ready` for a LinkedIn list.
+- `linkedin_activity`: `activity_status` (`active` ≤30d, `stale` 31–90d, `inactive`), `activity_level`
+  (`minimal` 0, `low` 1–2, `moderate` 3–9, `high` 10+ actions in 90d), `outreach_ready` (active, or stale with
+  moderate+ volume), and a `reason` line. Thresholds are in `src/lib/activity.ts`.
 
 ## Compliance, read this
 
@@ -168,7 +193,7 @@ you plug in and the email laws where you send. This tool builds a list; what you
 ## Layout
 
 ```
-schema.sql                 three tables + one view, idempotent
+schema.sql                 five tables + two views, idempotent
 scripts/run.ts             the CLI
 src/repos.ts               seed repos, vendor aliases
 src/lib/clickhouse.ts      actors from the GH Archive mirror

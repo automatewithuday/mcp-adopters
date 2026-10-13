@@ -69,7 +69,7 @@ export function qualify(p: Profile): { qualified: boolean; score: number; compan
 }
 
 import { OWNER_ALIASES } from "../repos.ts";
-const alnum = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+export const alnum = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
 /**
  * Works for the vendor that ships a repo they actively contributed to (fork/issue/PR), judged by the

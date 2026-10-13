@@ -14,7 +14,8 @@
     "@supabase/supabase-js": "^2.117.3",
     "@trigger.dev/sdk": "^4.7.3",
     "@typesafe-ai/sdk": "^0.6.0",
-    "deepline": "^0.3.348"
+    "deepline": "^0.3.348",
+    "yaml": "^2.9.1"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",

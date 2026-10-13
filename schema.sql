@@ -47,15 +47,60 @@ create index if not exists spend_run on spend (run_id);
 alter table spend add column if not exists key text;
 create unique index if not exists spend_key on spend (key);
 
--- Used by enrich-batch: qualified people not yet enriched, plus people a free-only run touched
--- (no paid tool used, no work email) so a later paid run can pick them up.
--- Re-run this after adding columns to people: a view freezes p.* at creation time.
+-- people_to_enrich is defined at the bottom of this file (after every `alter table people`).
+
+-- Spend so far for one enrich run; used by enrich-person before every paid call.
+create or replace function run_spend(rid text) returns numeric language sql stable as
+  $$ select coalesce(sum(usd), 0) from spend where run_id = rid $$;
+
+-- ---- ICP gate, outreach channel, LinkedIn activity (added 2026-10-14) ---------------------------
+-- One row per company. key = alnum(company_norm), or company_domain when the profile has no company name.
+-- icp_fit: true/false from the owner's ICP (client-profile.yaml icp_hard_filters); null = unknown or
+-- the provider returned a different company than asked for (icp_reason says which). Unknown is held, never dropped.
+create table if not exists companies (
+  key text primary key,
+  name text, domain text, linkedin text,
+  employees int, employees_min int, employees_max int, hq_country text, industry text,
+  icp_fit boolean, icp_reason text, source text,
+  checked_at timestamptz
+);
+-- spend.login holds the company key for company lookups.
+alter table people
+  add column if not exists company_key text,
+  add column if not exists icp_fit boolean;  -- denormalised from companies so enrich can filter on one column
+create index if not exists people_company_key on people (company_key);
+
+-- LinkedIn activity, checked before LinkedIn outreach. Reactions carry no date, so they only feed the count.
+create table if not exists linkedin_activity (
+  login text primary key references people (login),
+  linkedin text,
+  posts_30d int, posts_90d int, comments_30d int, comments_90d int, reactions int,
+  last_activity_at timestamptz, days_since_last_activity int,
+  activity_status text,   -- active (<=30d) | stale (31-90d) | inactive (>90d or nothing dated)
+  activity_level text,    -- minimal | low | moderate | high  (posts+comments in 90d + reactions: 0 / 1-2 / 3-9 / 10+)
+  outreach_ready boolean, reason text,
+  checked_at timestamptz default now()
+);
+
+-- Recreated here because people gained columns above (a view freezes p.* at creation time).
 create or replace view people_to_enrich as
   select p.* from people p left join contacts c on c.login = p.login
   where p.qualified
     and (c.login is null
          or (cardinality(c.tools_used) = 0 and c.email_source in ('none', 'skipped_cap', 'github_profile_personal')));
 
--- Spend so far for one enrich run; used by enrich-person before every paid call.
-create or replace function run_spend(rid text) returns numeric language sql stable as
-  $$ select coalesce(sum(usd), 0) from spend where run_id = rid $$;
+-- What a rep works from. channel: email when we have one; linkedin when there is a profile URL but no
+-- email; none otherwise. (Relaxed 2026-10-14: no longer requires a company domain.)
+create or replace view outreach_queue as
+  select p.login, p.name, p.company_norm, p.company_key,
+         coalesce(c.company_domain, p.company_domain) as company_domain,
+         p.rank, p.icp_fit, c.email, c.email_source, c.title,
+         coalesce(c.linkedin, p.linkedin) as linkedin,
+         case when c.email is not null then 'email'
+              when coalesce(c.linkedin, p.linkedin) is not null then 'linkedin'
+              else 'none' end as channel,
+         a.activity_status, a.activity_level, a.outreach_ready, a.days_since_last_activity
+  from people p
+  left join contacts c on c.login = p.login
+  left join linkedin_activity a on a.login = p.login
+  where p.qualified and coalesce(p.maintainer, false) = false;
