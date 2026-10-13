@@ -1,0 +1,5 @@
+node_modules
+.env
+.trigger
+.DS_Store
+dist

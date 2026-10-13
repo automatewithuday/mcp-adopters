@@ -1,0 +1,30 @@
+{
+  "name": "mcp-adopters",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "trigger.dev dev",
+    "deploy": "trigger.dev deploy",
+    "test": "tsx --test src/lib/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "run": "tsx scripts/run.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.117.3",
+    "@trigger.dev/sdk": "^4.7.3",
+    "@typesafe-ai/sdk": "^0.6.0",
+    "deepline": "^0.3.348"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "trigger.dev": "^4.7.3",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
+  },
+  "description": "Rank and enrich the people starring, forking and contributing to MCP server repos. Bring your own keys.",
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}
