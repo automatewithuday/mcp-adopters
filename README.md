@@ -85,14 +85,16 @@ npm install
 cp .env.example .env     # fill in the keys
 ```
 
-Paste `schema.sql` into the Supabase SQL editor and run it (safe to re-run). Edit `src/repos.ts` if you
-want different seed repos.
+Paste `schema.sql` into the Supabase SQL editor and run it (safe to re-run). `repos.json` is the source list:
+`npx tsx scripts/run.ts discover` refreshes it from GitHub search (MCP in the repo name, 1000+ stars; entries
+marked `curated` are kept). Review the diff before fetching.
 
 ## Run
 
 ```bash
 npm test
 npx tsx scripts/run.ts fetch --days 60 --limit 300   # find actors, read the first 300 profiles
+npx tsx scripts/run.ts fetch --source builders        # people pushing to someone else's MCP-named repo (free, GH Archive)
 npx tsx scripts/run.ts rank                           # AI rank for everyone who passed the rules
 npx tsx scripts/run.ts report                         # funnel + top 20 with reasoning
 npx tsx scripts/run.ts enrich --run-id pilot --max-usd 10 --min-rank 55 --limit 50
@@ -102,7 +104,7 @@ With an ICP (optional, company-level gate before paid enrichment):
 
 ```bash
 # client-profile.yaml is what the icp-onboarding skill writes; only icp_hard_filters.headcount_min/max and .countries are read
-npx tsx scripts/run.ts icp --icp ~/path/client-profile.yaml --run-id icp1 --max-usd 1   # headcount + HQ per company, $0.003 each
+npx tsx scripts/run.ts icp --icp ~/path/client-profile.yaml --run-id icp1 --max-usd 1   # headcount + HQ per company, $0.003 each; only companies with someone at rank ≥ --min-rank
 npx tsx scripts/run.ts enrich --icp ~/path/client-profile.yaml --run-id pilot --max-usd 10 --min-rank 55
 npx tsx scripts/run.ts activity --icp ~/path/client-profile.yaml --run-id act1 --max-usd 1 --min-rank 40  # LinkedIn activity, ~$0.01/profile
 ```
@@ -159,7 +161,8 @@ will do; most aggregators expose all three.
 
 | what | where |
 |---|---|
-| seed repos, and which company names count as "works for the vendor" | `src/repos.ts` |
+| seed repos | `repos.json` (regenerate with `discover`) |
+| which company names count as "works for the vendor" | `src/repos.ts` |
 | drop rules and the rule score | `src/lib/qualify.ts` (tests in `qualify.test.ts`) |
 | the five AI questions and the rank weights (35% adoption, 30% security influence, 20% real company, 15% role) | top of `src/lib/rank.ts` |
 | enrichment order and spend cap behaviour | `src/lib/pipeline.ts` |
@@ -195,7 +198,9 @@ you plug in and the email laws where you send. This tool builds a list; what you
 ```
 schema.sql                 five tables + two views, idempotent
 scripts/run.ts             the CLI
-src/repos.ts               seed repos, vendor aliases
+repos.json                 seed repos (owner-approved, from `discover`)
+src/repos.ts               vendor aliases
+src/lib/discover.ts        GitHub search → candidate repos
 src/lib/clickhouse.ts      actors from the GH Archive mirror
 src/lib/github.ts          profiles via GraphQL, 100 per call
 src/lib/qualify.ts         rules and rule score

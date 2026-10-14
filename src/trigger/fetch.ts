@@ -6,8 +6,8 @@ import { SEED_REPOS } from "../repos.ts";
 export const fetchActors = task({
   id: "fetch-actors",
   maxDuration: 600,
-  run: async (payload: { days?: number; repos?: string[] }) => {
-    const logins = await fetchActorsStep(payload.repos ?? SEED_REPOS, payload.days ?? 365);
+  run: async (payload: { days?: number; repos?: string[]; source?: "repos" | "builders" }) => {
+    const logins = await fetchActorsStep(payload.repos ?? SEED_REPOS, payload.days ?? 365, payload.source);
     const batches = chunk(logins, 100).map((l) => ({ payload: { logins: l } }));
     for (const b of chunk(batches, 1000)) await fetchProfiles.batchTrigger(b);
     return { actors: logins.length, profileBatches: batches.length };

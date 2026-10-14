@@ -52,7 +52,10 @@ export type Judgments = {
   real_company: number; enterprise: number;
 };
 
-const SIGNAL_WORDS: Record<string, string> = { WatchEvent: "starred", ForkEvent: "forked", IssuesEvent: "opened an issue on", PullRequestEvent: "sent a pull request to" };
+const SIGNAL_WORDS: Record<string, string> = {
+  WatchEvent: "starred", ForkEvent: "forked", IssuesEvent: "opened an issue on", PullRequestEvent: "sent a pull request to",
+  PushEvent: "pushed commits to", CreateEvent: "created", ReleaseEvent: "published a release of",
+};
 
 export function stateFor(p: PersonState) {
   return {
@@ -91,7 +94,7 @@ const short = (repo: string) => repo.split("/")[1] ?? repo;
 
 /** One line an outreach rep can read next to the rank. Built from the judgments, not model text. */
 export function explain(j: Judgments, p: PersonState): string {
-  const ACT: Record<string, string> = { ForkEvent: "forked", IssuesEvent: "issue", PullRequestEvent: "PR" };
+  const ACT: Record<string, string> = { ForkEvent: "forked", IssuesEvent: "issue", PullRequestEvent: "PR", PushEvent: "pushed to", CreateEvent: "created", ReleaseEvent: "released" };
   const acts = p.signals.filter((s) => s in ACT).map((s) => ACT[s]);
   const repos = p.repos.map(short).join(", ");
   const evidence = [acts.length ? `${acts.join(" + ")} on ${repos}` : `starred ${repos}`];

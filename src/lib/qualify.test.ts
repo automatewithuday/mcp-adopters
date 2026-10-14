@@ -87,4 +87,7 @@ test("isMaintainer: vendor employees who contributed, not stargazers or outsider
   assert.equal(isMaintainer({ company: "Microsoft", bio: null, repos: ["microsoft/playwright-mcp"], signals: ["WatchEvent"] }), false);
   assert.equal(isMaintainer({ company: "Netflix", bio: "I love the GitHub MCP server", repos: ["github/github-mcp-server"], signals: prs }), false);
   assert.equal(isMaintainer({ company: "Google", bio: null, repos: ["googleapis/mcp-toolbox"], signals: ["IssuesEvent"] }), true);
+  // builder-sourced repos never make a maintainer: pushing to your employer's MCP server is the buyer signal
+  assert.equal(isMaintainer({ company: "Acme", bio: null, repos: ["acme/internal-mcp"], signals: ["PushEvent", "CreateEvent"] }), false);
+  assert.equal(isMaintainer({ company: "Prefect", bio: null, repos: ["PrefectHQ/fastmcp", "prefecthq/other-mcp"], signals: ["WatchEvent", "PushEvent"] }), false);
 });

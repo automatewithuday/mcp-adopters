@@ -1,6 +1,6 @@
 // Plain functions shared by the Trigger.dev tasks and scripts/run.ts. No Trigger imports here.
-import { db } from "./db.ts";
-import { actorsFor } from "./clickhouse.ts";
+import { db, all } from "./db.ts";
+import { actorsFor, buildersFor } from "./clickhouse.ts";
 import { profiles, orgDomain, domainOf } from "./github.ts";
 import { qualify, isFreemail, emailInText, websiteMatchesCompany, HOSTING_DOMAIN, isMaintainer } from "./qualify.ts";
 import { provider, type Hit, type Found, type Firmographics } from "./providers/index.ts";
@@ -10,11 +10,19 @@ import { scoreActivity } from "./activity.ts";
 
 export const chunk = <T>(xs: T[], n: number) => Array.from({ length: Math.ceil(xs.length / n) }, (_, i) => xs.slice(i * n, i * n + n));
 
-/** ClickHouse → people (login, repos, signals, last_seen). Returns the logins. */
-export async function fetchActorsStep(repos: string[], days: number): Promise<string[]> {
-  const actors = await actorsFor(repos, days);
-  for (const rows of chunk(actors, 1000)) {
-    const { error } = await db.from("people").upsert(rows, { onConflict: "login" });
+/** ClickHouse → people (login, repos, signals, last_seen), merged with what earlier fetches stored. Returns the logins. */
+export async function fetchActorsStep(repos: string[], days: number, source: "repos" | "builders" = "repos"): Promise<string[]> {
+  const actors = source === "builders" ? await buildersFor(days) : await actorsFor(repos, days);
+  for (const rows of chunk(actors, 300)) {
+    // a person can come from both sources: union repos/signals instead of letting the later fetch overwrite
+    const { data: prev, error: e1 } = await db.from("people").select("login,repos,signals").in("login", rows.map((r) => r.login));
+    if (e1) throw new Error(`people select: ${e1.message}`);
+    const byLogin = new Map((prev ?? []).map((r) => [r.login, r]));
+    const merged = rows.map((r) => {
+      const p = byLogin.get(r.login);
+      return p ? { ...r, repos: [...new Set([...p.repos, ...r.repos])], signals: [...new Set([...p.signals, ...r.signals])] } : r;
+    });
+    const { error } = await db.from("people").upsert(merged, { onConflict: "login" });
     if (error) throw new Error(`people upsert: ${error.message}`);
   }
   return actors.map((a) => a.login);
@@ -59,8 +67,17 @@ export async function rankStep(logins: string[], concurrency = 8) {
   const people = (data ?? []) as PersonState[];
   const rows: Record<string, unknown>[] = [];
   for (const batch of chunk(people, concurrency)) {
-    const judged = await Promise.all(batch.map(async (p) => ({ p, j: await judge(p) })));
-    for (const { p, j } of judged) {
+    // ponytail: provider 5xx/499 are transient; two retries, then skip the person (ranked_at stays null, the next run picks them up)
+    const judged = await Promise.all(batch.map(async (p) => {
+      for (let attempt = 0; ; attempt++) {
+        try { return { p, j: await judge(p) }; }
+        catch (e) {
+          if (attempt >= 2) { console.error(`rank skip ${p.login}: ${(e as Error).message.slice(0, 120)}`); return null; }
+          await new Promise((r) => setTimeout(r, 2000 * 4 ** attempt));
+        }
+      }
+    }));
+    for (const { p, j } of judged.filter((x) => x !== null)) {
       rows.push({
         login: p.login, rank: compose(j, p), reasoning: explain(j, p),
         persona: j.persona, persona_p: j.persona_p, adoption: j.adoption, security_influence: j.security,
@@ -193,21 +210,23 @@ export async function enrichPersonStep(
 
 export type CompanyRef = { key: string; name: string | null; domain: string | null };
 
-/** Companies behind qualified, non-maintainer people that have no verdict yet (all of them with `force`). */
-export async function icpCandidates(force = false): Promise<CompanyRef[]> {
-  const { data, error } = await db.from("people").select("company_key,company_norm,company_domain")
-    .eq("qualified", true).or("maintainer.is.null,maintainer.eq.false").not("company_key", "is", null).limit(10000);
-  if (error) throw new Error(`people select: ${error.message}`);
+/**
+ * Companies behind qualified, non-maintainer people ranked ≥ minRank that have no verdict yet (all of them with `force`).
+ * Unranked people don't count: run `rank` first. The rank gate keeps the paid lookup off the long tail.
+ */
+export async function icpCandidates(force = false, minRank = 0): Promise<CompanyRef[]> {
+  const data = await all((a, b) => db.from("people").select("company_key,company_norm,company_domain")
+    .eq("qualified", true).or("maintainer.is.null,maintainer.eq.false").not("company_key", "is", null).gte("rank", minRank).order("login").range(a, b));
   const byKey = new Map<string, CompanyRef>();
-  for (const r of data ?? []) {
+  for (const r of data) {
     const c = byKey.get(r.company_key) ?? { key: r.company_key, name: null, domain: null };
     c.name ??= r.company_norm; c.domain ??= r.company_domain;
     byKey.set(r.company_key, c);
   }
   if (!force) {
-    const { data: done, error: e2 } = await db.from("companies").select("key").not("checked_at", "is", null).limit(10000);
-    if (e2) throw new Error(`companies select: ${e2.message}`);
-    for (const r of done ?? []) byKey.delete(r.key);
+    // a provider error (credits, 5xx) is not a verdict: those companies are checked again next run
+    const done = await all((a, b) => db.from("companies").select("key").not("checked_at", "is", null).not("icp_reason", "like", "error:%").order("key").range(a, b));
+    for (const r of done) byKey.delete(r.key);
   }
   return [...byKey.values()];
 }

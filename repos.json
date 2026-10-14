@@ -1,0 +1,832 @@
+[
+  {
+    "repo": "ChromeDevTools/chrome-devtools-mcp",
+    "stars": 53466,
+    "desc": "Chrome DevTools for coding agents"
+  },
+  {
+    "repo": "DeusData/codebase-memory-mcp",
+    "stars": 46513,
+    "desc": "High-performance code intelligence MCP server. Indexes codebases into a persistent knowledge graph —"
+  },
+  {
+    "repo": "microsoft/playwright-mcp",
+    "stars": 38101,
+    "desc": "Playwright MCP server"
+  },
+  {
+    "repo": "github/github-mcp-server",
+    "stars": 33589,
+    "desc": "GitHub's official MCP Server"
+  },
+  {
+    "repo": "ahujasid/mcp-for-blender",
+    "stars": 30650,
+    "desc": "Community plugin to control Blender 3D with any LLM of your choice. Not affiliated with the official"
+  },
+  {
+    "repo": "oraios/serena",
+    "stars": 30228,
+    "desc": "A powerful MCP toolkit for coding, providing semantic retrieval and editing capabilities  ",
+    "curated": true
+  },
+  {
+    "repo": "PrefectHQ/fastmcp",
+    "stars": 28067,
+    "desc": "🚀 The fast, Pythonic way to build MCP servers and clients."
+  },
+  {
+    "repo": "modelcontextprotocol/python-sdk",
+    "stars": 24566,
+    "desc": "The official Python SDK for Model Context Protocol servers and clients"
+  },
+  {
+    "repo": "czlonkowski/n8n-mcp",
+    "stars": 23059,
+    "desc": "A MCP for Claude Desktop / Claude Code / Windsurf / Cursor to build n8n workflows for you "
+  },
+  {
+    "repo": "googleapis/mcp-toolbox",
+    "stars": 16658,
+    "desc": "MCP Toolbox for Databases is an open source MCP server for databases."
+  },
+  {
+    "repo": "xpzouying/xiaohongshu-mcp",
+    "stars": 16260,
+    "desc": "MCP for xiaohongshu.com"
+  },
+  {
+    "repo": "GLips/Figma-Context-MCP",
+    "stars": 15980,
+    "desc": "MCP server to provide Figma layout information to AI coding agents like Cursor"
+  },
+  {
+    "repo": "CoplayDev/unity-mcp",
+    "stars": 14909,
+    "desc": "Unity MCP acts as a bridge between AI assistants and your Unity Editor. Give your LLM tools to manag"
+  },
+  {
+    "repo": "modelcontextprotocol/typescript-sdk",
+    "stars": 13575,
+    "desc": "The official TypeScript SDK for Model Context Protocol servers and clients"
+  },
+  {
+    "repo": "mrexodia/ida-pro-mcp",
+    "stars": 12787,
+    "desc": "AI-powered reverse engineering assistant that bridges IDA Pro with language models through MCP."
+  },
+  {
+    "repo": "0x4m4/hexstrike-ai",
+    "stars": 12757,
+    "desc": "HexStrike AI MCP Agents is an advanced MCP server that lets AI agents (Claude, GPT, Copilo",
+    "curated": true
+  },
+  {
+    "repo": "hangwin/mcp-chrome",
+    "stars": 12488,
+    "desc": "Chrome MCP Server is a Chrome extension-based Model Context Protocol (MCP) server that exposes your "
+  },
+  {
+    "repo": "tadata-org/fastapi_mcp",
+    "stars": 12019,
+    "desc": "Expose your FastAPI endpoints as Model Context Protocol (MCP) tools, with Auth!"
+  },
+  {
+    "repo": "BeehiveInnovations/pal-mcp-server",
+    "stars": 11780,
+    "desc": "The power of Claude Code / GeminiCLI / CodexCLI + [Gemini / OpenAI / OpenRouter / Azure / Grok / Oll"
+  },
+  {
+    "repo": "LaurieWired/GhidraMCP",
+    "stars": 11200,
+    "desc": "MCP Server for Ghidra"
+  },
+  {
+    "repo": "modelcontextprotocol/inspector",
+    "stars": 11067,
+    "desc": "Visual testing tool for MCP servers"
+  },
+  {
+    "repo": "apify/apify-mcp-server",
+    "stars": 11008,
+    "desc": "The Apify MCP server enables your AI agents to extract data from social media, search engines, maps,"
+  },
+  {
+    "repo": "mcp-use/mcp-use",
+    "stars": 10753,
+    "desc": "The fullstack MCP framework to develop MCP Apps for ChatGPT / Claude & MCP Servers for AI Agents."
+  },
+  {
+    "repo": "wonderwhy-er/DesktopCommanderMCP",
+    "stars": 10029,
+    "desc": "This is MCP server for Claude that gives it terminal control, file system search and diff file editi"
+  },
+  {
+    "repo": "awslabs/mcp",
+    "stars": 9777,
+    "desc": "Open source MCP Servers for AWS"
+  },
+  {
+    "repo": "modelcontextprotocol/modelcontextprotocol",
+    "stars": 9446,
+    "desc": "Specification and documentation for the Model Context Protocol"
+  },
+  {
+    "repo": "mobile-next/mobile-mcp",
+    "stars": 9096,
+    "desc": "Model Context Protocol Server for Mobile Automation and Scraping (iOS, Android, Emulators, Simulator"
+  },
+  {
+    "repo": "CursorTouch/Windows-MCP",
+    "stars": 8887,
+    "desc": "MCP Server for Computer Use in Windows"
+  },
+  {
+    "repo": "maximhq/bifrost",
+    "stars": 8760,
+    "desc": "Open-source, high-performance AI gateway that works as your LLM gateway, MCP gateway and a",
+    "curated": true
+  },
+  {
+    "repo": "lastmile-ai/mcp-agent",
+    "stars": 8574,
+    "desc": "Build effective agents using Model Context Protocol and simple workflow patterns"
+  },
+  {
+    "repo": "idosal/git-mcp",
+    "stars": 8461,
+    "desc": "Put an end to code hallucinations! GitMCP is a free, open-source, remote MCP server for any GitHub p"
+  },
+  {
+    "repo": "firecrawl/firecrawl-mcp-server",
+    "stars": 7596,
+    "desc": "🔥 Official Firecrawl MCP Server - Adds powerful web scraping and search to Cursor, Claude and any o"
+  },
+  {
+    "repo": "modelcontextprotocol/registry",
+    "stars": 7349,
+    "desc": "A community driven registry service for Model Context Protocol (MCP) servers."
+  },
+  {
+    "repo": "AgentDeskAI/browser-tools-mcp",
+    "stars": 7328,
+    "desc": "Monitor browser logs directly from Cursor and other MCP compatible IDEs."
+  },
+  {
+    "repo": "BrowserMCP/mcp",
+    "stars": 7181,
+    "desc": "Browser MCP is a Model Context Provider (MCP) server that allows AI applications to control your bro"
+  },
+  {
+    "repo": "grab/cursor-talk-to-figma-mcp",
+    "stars": 7051,
+    "desc": "TalkToFigma: MCP integration between AI Agent (Cursor, Claude Code, Codex) and Figma, allowing Agent"
+  },
+  {
+    "repo": "lharries/whatsapp-mcp",
+    "stars": 6580,
+    "desc": "WhatsApp MCP server"
+  },
+  {
+    "repo": "getsentry/MobileBuildMCP",
+    "stars": 6476,
+    "desc": "A Model Context Protocol (MCP) server and CLI that provides tools for agent use when working on iOS "
+  },
+  {
+    "repo": "Coding-Solo/godot-mcp",
+    "stars": 6054,
+    "desc": "MCP server for interfacing with Godot game engine. Provides tools for launching the editor, running "
+  },
+  {
+    "repo": "21st-dev/magic-mcp",
+    "stars": 6005,
+    "desc": "It's like v0, but in your Cursor / Claude Code / Windsurf: search 10,000+ React/Tailwind components,"
+  },
+  {
+    "repo": "sooperset/mcp-atlassian",
+    "stars": 5997,
+    "desc": "MCP server for Atlassian tools (Confluence, Jira)"
+  },
+  {
+    "repo": "Klavis-AI/klavis",
+    "stars": 5809,
+    "desc": "Klavis AI:  MCP integration platforms that let AI agents use tools reliably at any scale",
+    "curated": true
+  },
+  {
+    "repo": "executeautomation/mcp-playwright",
+    "stars": 5666,
+    "desc": "Playwright Model Context Protocol Server - Tool to automate Browsers and APIs in Claude Desktop, Cli"
+  },
+  {
+    "repo": "bethington/ghidra-mcp",
+    "stars": 5572,
+    "desc": "Ghidra MCP Server — 200+ MCP tools for AI-powered reverse engineering. GUI plugin + headless server,"
+  },
+  {
+    "repo": "54yyyu/zotero-mcp",
+    "stars": 5366,
+    "desc": "Zotero MCP: Connects your Zotero research library with Claude and other AI assistants via the Model "
+  },
+  {
+    "repo": "agentgateway/agentgateway",
+    "stars": 5313,
+    "desc": "Next Generation Agentic Proxy for AI Agents and MCP servers",
+    "curated": true
+  },
+  {
+    "repo": "Ryze-AI-Adgent/open-seo-mcp-skills",
+    "stars": 5250,
+    "desc": "Free SEO MCP server + open-source SEO and GEO skills for Claude: keyword research, rank tracking, au"
+  },
+  {
+    "repo": "modelcontextprotocol/go-sdk",
+    "stars": 5212,
+    "desc": "The official Go SDK for Model Context Protocol servers and clients. Maintained in collaboration with"
+  },
+  {
+    "repo": "exa-labs/exa-mcp-server",
+    "stars": 5120,
+    "desc": "Exa MCP for web search and web crawling!"
+  },
+  {
+    "repo": "homeassistant-ai/ha-mcp",
+    "stars": 5055,
+    "desc": "The Unofficial and Awesome Home Assistant MCP Server"
+  },
+  {
+    "repo": "atilaahmettaner/tradingview-mcp",
+    "stars": 5049,
+    "desc": "TradingView MCP server — real-time market data, technical analysis, screeners & backtesting for Clau"
+  },
+  {
+    "repo": "irinabuht12-oss/google-ads-meta-ads-mcp",
+    "stars": 4722,
+    "desc": "Google Ads MCP server + Meta Ads MCP (Facebook Ads MCP) + Google Analytics MCP (GA4) + Search Consol"
+  },
+  {
+    "repo": "makenotion/notion-mcp-server",
+    "stars": 4666,
+    "desc": "Official Notion MCP Server"
+  },
+  {
+    "repo": "IBM/mcp-context-forge",
+    "stars": 4622,
+    "desc": "An AI Gateway, registry, and proxy that sits in front of any MCP, A2A, or REST/gRPC APIs, exposing a"
+  },
+  {
+    "repo": "modelcontextprotocol/csharp-sdk",
+    "stars": 4581,
+    "desc": "The official C# SDK for Model Context Protocol servers and clients. Maintained in collaboration with"
+  },
+  {
+    "repo": "MarkusPfundstein/mcp-obsidian",
+    "stars": 4473,
+    "desc": "MCP server that interacts with Obsidian via the Obsidian rest API community plugin"
+  },
+  {
+    "repo": "IvanMurzak/Unity-MCP",
+    "stars": 4429,
+    "desc": "AI Skills, MCP Tools, and CLI for Unity Engine. Full AI develop and test loop. Use cli for quick set"
+  },
+  {
+    "repo": "open-webui/mcpo",
+    "stars": 4400,
+    "desc": "A simple, secure MCP-to-OpenAPI proxy server"
+  },
+  {
+    "repo": "antvis/mcp-server-chart",
+    "stars": 4397,
+    "desc": "🤖 A visualization mcp & skills contains 25+ visual charts using @antvis. Using for chart generation"
+  },
+  {
+    "repo": "cloudflare/mcp-server-cloudflare",
+    "stars": 4377,
+    "desc": ""
+  },
+  {
+    "repo": "archestra-ai/archestra",
+    "stars": 4370,
+    "desc": "Enterprise AI Platform with guardrails, MCP registry, gateway & orchestrator",
+    "curated": true
+  },
+  {
+    "repo": "Pimzino/spec-workflow-mcp",
+    "stars": 4304,
+    "desc": "A Model Context Protocol (MCP) server that provides structured spec-driven development workflow tool"
+  },
+  {
+    "repo": "haris-musa/excel-mcp-server",
+    "stars": 4235,
+    "desc": "Excel MCP server: let AI (Claude, Cursor, Codex) create and edit Excel files with charts, PivotTable"
+  },
+  {
+    "repo": "modelcontextprotocol/rust-sdk",
+    "stars": 4012,
+    "desc": "The official Rust SDK for the Model Context Protocol"
+  },
+  {
+    "repo": "stickerdaniel/linkedin-mcp-server",
+    "stars": 3855,
+    "desc": "Open-source MCP server for LinkedIn. Give Claude and any MCP-compatible AI agent access to profiles,"
+  },
+  {
+    "repo": "microsoft/mcp",
+    "stars": 3771,
+    "desc": "Catalog of official Microsoft MCP (Model Context Protocol) server implementations for AI-powered dat"
+  },
+  {
+    "repo": "Minidoracat/mcp-feedback-enhanced",
+    "stars": 3760,
+    "desc": "Enhanced MCP server for interactive user feedback and command execution in AI-assisted development, "
+  },
+  {
+    "repo": "modelcontextprotocol/java-sdk",
+    "stars": 3733,
+    "desc": "The official Java SDK for Model Context Protocol servers and clients. Maintained in collaboration wi"
+  },
+  {
+    "repo": "grafana/mcp-grafana",
+    "stars": 3558,
+    "desc": "MCP server for Grafana"
+  },
+  {
+    "repo": "samuelgursky/davinci-resolve-mcp",
+    "stars": 3525,
+    "desc": "MCP server integration for DaVinci Resolve Studio"
+  },
+  {
+    "repo": "browserbase/mcp-server-browserbase",
+    "stars": 3401,
+    "desc": "Allow LLMs to control a browser with Browserbase and Stagehand"
+  },
+  {
+    "repo": "taylorwilsdon/google_workspace_mcp",
+    "stars": 3333,
+    "desc": "Control Gmail, Google Calendar, Docs, Sheets, Slides, Chat, Forms, Tasks, Search & Drive with AI - C"
+  },
+  {
+    "repo": "punkpeye/fastmcp",
+    "stars": 3273,
+    "desc": "A TypeScript framework for building MCP servers."
+  },
+  {
+    "repo": "blazickjp/arxiv-mcp-server",
+    "stars": 3214,
+    "desc": "A local MCP server for agent literature work. Original-LaTeX section reads, BibTeX from arXiv metada"
+  },
+  {
+    "repo": "ahujasid/ableton-mcp",
+    "stars": 3181,
+    "desc": "Control Ableton Live with any LLM: create tracks, arrange clips & compose music via MCP"
+  },
+  {
+    "repo": "snyk/agent-scan",
+    "stars": 3136,
+    "desc": "Security scanner for AI agents, MCP servers and agent skills.",
+    "curated": true
+  },
+  {
+    "repo": "Jpisnice/shadcn-ui-mcp-server",
+    "stars": 3047,
+    "desc": "A mcp server to allow LLMS gain context about shadcn ui component structure,usage and installation,c"
+  },
+  {
+    "repo": "zcaceres/markdownify-mcp",
+    "stars": 2998,
+    "desc": "A Model Context Protocol server for converting almost anything to Markdown"
+  },
+  {
+    "repo": "modelcontextprotocol/ext-apps",
+    "stars": 2949,
+    "desc": "Official repo for spec & SDK of MCP Apps protocol - standard for UIs embedded AI chatbots, served by"
+  },
+  {
+    "repo": "zhizhuodemao/js-reverse-mcp",
+    "stars": 2946,
+    "desc": "AI Agent-first JS 逆向 MCP Server：有头 Chrome 调试、断点、网络/WebSocket 分析、Patchright 反检测，可选 CloakBrowser。"
+  },
+  {
+    "repo": "supercorp-ai/supergateway",
+    "stars": 2898,
+    "desc": "Run MCP stdio servers over HTTP streamable, SSE and SSE over stdio. AI gateway.",
+    "curated": true
+  },
+  {
+    "repo": "zinja-coder/jadx-ai-mcp",
+    "stars": 2892,
+    "desc": "Plugin for JADX to integrate MCP server"
+  },
+  {
+    "repo": "neka-nat/freecad-mcp",
+    "stars": 2838,
+    "desc": "FreeCAD MCP(Model Context Protocol) server"
+  },
+  {
+    "repo": "openags/paper-search-mcp",
+    "stars": 2819,
+    "desc": "MCP, CLI, Skills for searching and downloading academic papers from multiple sources like arXiv, Pub"
+  },
+  {
+    "repo": "sparfenyuk/mcp-proxy",
+    "stars": 2782,
+    "desc": "A bridge between Streamable HTTP and stdio MCP transports"
+  },
+  {
+    "repo": "feder-cr/invisible_playwright_mcp",
+    "stars": 2766,
+    "desc": "Playwright MCP server undetected by anti-bots and captchas: AI agent browses the web on anti-detect "
+  },
+  {
+    "repo": "jgravelle/jcodemunch-mcp",
+    "stars": 2764,
+    "desc": "Cut AI token costs 95%+ on code exploration. The leading MCP server for precise, symbol-level GitHub"
+  },
+  {
+    "repo": "metatool-ai/metamcp",
+    "stars": 2705,
+    "desc": "MCP Aggregator, Orchestrator, Middleware, Gateway in one docker"
+  },
+  {
+    "repo": "chrisryugj/korean-law-mcp",
+    "stars": 2698,
+    "desc": "법제처 국가법령정보를 LLM에서 바로 조회하는 MCP 서버. 법령·판례·조례 검색과 인용 검증 | MCP server for Korean law — search statutes, "
+  },
+  {
+    "repo": "mixelpixx/KiCAD-MCP-Server",
+    "stars": 2679,
+    "desc": "KiCAD MCP is a Model Context Protocol (MCP) implementation that enables Large Language Models (LLMs)"
+  },
+  {
+    "repo": "brightdata/brightdata-mcp",
+    "stars": 2673,
+    "desc": "A powerful Model Context Protocol (MCP) server that provides an all-in-one solution for public web a"
+  },
+  {
+    "repo": "perplexityai/modelcontextprotocol",
+    "stars": 2562,
+    "desc": "The official MCP server implementation for the Perplexity API Platform"
+  },
+  {
+    "repo": "yctimlin/mcp_excalidraw",
+    "stars": 2536,
+    "desc": "MCP server and Claude Code skill for Excalidraw — programmatic canvas toolkit to create, edit, and e"
+  },
+  {
+    "repo": "samanhappy/mcphub",
+    "stars": 2524,
+    "desc": "Self-hosted MCP gateway and control plane for connecting, controlling, and operating MCP servers."
+  },
+  {
+    "repo": "duty1g/x64dbg-mcp-server",
+    "stars": 2489,
+    "desc": "x64dbg-MCP Server is a native MCP (Model Context Protocol) plugin for x64dbg that exposes the debugg"
+  },
+  {
+    "repo": "tavily-ai/tavily-mcp",
+    "stars": 2429,
+    "desc": "Production ready MCP server with real-time search, extract, map & crawl."
+  },
+  {
+    "repo": "knowsuchagency/mcp2cli",
+    "stars": 2413,
+    "desc": "Turn any MCP, OpenAPI, or GraphQL server into a CLI — at runtime, with zero codegen"
+  },
+  {
+    "repo": "Joooook/12306-mcp",
+    "stars": 2372,
+    "desc": "This is a 12306 ticket search server based on the Model Context Protocol (MCP)."
+  },
+  {
+    "repo": "financial-datasets/mcp-server",
+    "stars": 2307,
+    "desc": "An MCP server for interacting with the Financial Datasets stock market API."
+  },
+  {
+    "repo": "jamubc/gemini-mcp-tool",
+    "stars": 2289,
+    "desc": "MCP server that enables AI assistants to interact with Google Gemini CLI, leveraging Gemini's massiv"
+  },
+  {
+    "repo": "stacklok/toolhive",
+    "stars": 2279,
+    "desc": "ToolHive is an enterprise-grade platform for running and managing Model Context Protocol (",
+    "curated": true
+  },
+  {
+    "repo": "MCPJam/inspector",
+    "stars": 2255,
+    "desc": "Testing and evaluation platform to chat, inspect, and debug MCP servers, MCP apps, and ChatGPT apps."
+  },
+  {
+    "repo": "vibheksoni/stealth-browser-mcp",
+    "stars": 2223,
+    "desc": "Stealth browser automation for AI agents over MCP and the Chrome DevTools Protocol: navigation, netw"
+  },
+  {
+    "repo": "joshuayoes/ios-simulator-mcp",
+    "stars": 2191,
+    "desc": "MCP server for interacting with the iOS simulator"
+  },
+  {
+    "repo": "containers/kubernetes-mcp-server",
+    "stars": 2158,
+    "desc": "Model Context Protocol (MCP) server for Kubernetes and OpenShift"
+  },
+  {
+    "repo": "benborla/mcp-server-mysql",
+    "stars": 2157,
+    "desc": "A Model Context Protocol server that provides read-only access to MySQL databases. This server enabl"
+  },
+  {
+    "repo": "cjo4m06/mcp-shrimp-task-manager",
+    "stars": 2147,
+    "desc": "Shrimp Task Manager is a task tool built for AI Agents, emphasizing chain-of-thought, reflection, an"
+  },
+  {
+    "repo": "modelcontextprotocol/mcpb",
+    "stars": 2141,
+    "desc": "Desktop Extensions: One-click local MCP server installation in desktop apps"
+  },
+  {
+    "repo": "mcp-router/mcp-router",
+    "stars": 2137,
+    "desc": "MCP Router — development, support and security updates ended 2026-09-18. Historical source and final"
+  },
+  {
+    "repo": "chatmcp/mcpso",
+    "stars": 2110,
+    "desc": "directory for Awesome MCP Servers"
+  },
+  {
+    "repo": "GongRzhe/Office-Word-MCP-Server",
+    "stars": 2108,
+    "desc": "A Model Context Protocol (MCP) server for creating, reading, and manipulating Microsoft Word documen"
+  },
+  {
+    "repo": "cyberagiinc/DevDocs",
+    "stars": 2106,
+    "desc": "Completely free, private, UI based Tech Documentation MCP server. Designed for coders and ",
+    "curated": true
+  },
+  {
+    "repo": "chongdashu/unreal-mcp",
+    "stars": 2095,
+    "desc": "Enable AI assistant clients like Cursor, Windsurf and Claude Desktop to control Unreal Engine throug"
+  },
+  {
+    "repo": "microsoft/azure-devops-mcp",
+    "stars": 2054,
+    "desc": "The MCP server for Azure DevOps, bringing the power of Azure DevOps directly to your agents."
+  },
+  {
+    "repo": "vmoranv/jshookmcp",
+    "stars": 2043,
+    "desc": "A search-first, profile-aware reverse-engineering workspace for AI agents — 735 tools across 36 doma"
+  },
+  {
+    "repo": "doobidoo/mcp-memory-service",
+    "stars": 2012,
+    "desc": "Open-source persistent memory for AI agent pipelines (LangGraph, CrewAI, AutoGen) and Claude. REST A"
+  },
+  {
+    "repo": "MicrosoftDocs/mcp",
+    "stars": 1947,
+    "desc": "Official Microsoft Learn MCP Server and CLI tool – powering LLMs and AI agents with real-time, trust"
+  },
+  {
+    "repo": "CoderGamester/mcp-unity",
+    "stars": 1930,
+    "desc": "Model Context Protocol (MCP) plugin to connect with Unity Editor — designed for Cursor, Claude Code,"
+  },
+  {
+    "repo": "AminForou/mcp-gsc",
+    "stars": 1917,
+    "desc": "Google Search Console Insights with Claude AI for SEOs"
+  },
+  {
+    "repo": "vybenetwork/solana-mcp-vybe",
+    "stars": 1866,
+    "desc": "Public Solana MCP registry metadata for Vybe Solana API"
+  },
+  {
+    "repo": "korotovsky/slack-mcp-server",
+    "stars": 1864,
+    "desc": "The most powerful MCP Slack Server with no permission requirements, Apps support, GovSlack, DMs, Gro"
+  },
+  {
+    "repo": "anysearch-ai/anysearch-mcp-server",
+    "stars": 1864,
+    "desc": "Unified real-time search MCP server supporting general web search, vertical domain search, parallel "
+  },
+  {
+    "repo": "GongRzhe/Office-PowerPoint-MCP-Server",
+    "stars": 1856,
+    "desc": "A MCP (Model Context Protocol) server for PowerPoint manipulation using python-pptx. This server pro"
+  },
+  {
+    "repo": "chigwell/telegram-mcp",
+    "stars": 1815,
+    "desc": "Telegram MCP server powered by Telethon to let MCP clients read chats, manage groups, and send/modif"
+  },
+  {
+    "repo": "Mcp-Brasil/mcp-brasil",
+    "stars": 1809,
+    "desc": "MCP Server para 70 APIs públicas brasileiras"
+  },
+  {
+    "repo": "arabold/docs-mcp-server",
+    "stars": 1797,
+    "desc": "Grounded Docs MCP Server: Open-Source Alternative to Context7, Nia, and Ref.Tools"
+  },
+  {
+    "repo": "ravitemer/mcphub.nvim",
+    "stars": 1788,
+    "desc": "An MCP client for Neovim that seamlessly integrates MCP servers into your editing workflow with an i"
+  },
+  {
+    "repo": "jau123/MeiGen-AI-Design-MCP",
+    "stars": 1781,
+    "desc": "Supports GPT Image 2, Seedance & ComfyUI, with a 1,400+ prompt library, carefully crafted hooks and "
+  },
+  {
+    "repo": "bitbonsai/mcpvault",
+    "stars": 1686,
+    "desc": "A lightweight Model Context Protocol (MCP) server for safe Obsidian vault access"
+  },
+  {
+    "repo": "mattt/iMCP",
+    "stars": 1685,
+    "desc": "A macOS app that provides an MCP server to your Messages, Contacts, Reminders and more"
+  },
+  {
+    "repo": "matlab/matlab-mcp-server",
+    "stars": 1654,
+    "desc": "Run MATLAB® using AI applications with the official MATLAB MCP Server from MathWorks®. This MCP serv"
+  },
+  {
+    "repo": "miscusi-peek/cheatengine-mcp-bridge",
+    "stars": 1634,
+    "desc": "Connect your favorite AI agents directly to Cheat Engine via MCP. Automate reverse engineering, poin"
+  },
+  {
+    "repo": "leonardsellem/n8n-mcp-server",
+    "stars": 1631,
+    "desc": "MCP server that provides tools and resources for interacting with n8n API"
+  },
+  {
+    "repo": "f/mcptools",
+    "stars": 1629,
+    "desc": "A command-line interface for interacting with MCP (Model Context Protocol) servers using both stdio "
+  },
+  {
+    "repo": "punkpeye/mcp-remote",
+    "stars": 1627,
+    "desc": "Connect an MCP Client that only supports local (stdio) servers to a Remote MCP Server."
+  },
+  {
+    "repo": "modelcontextprotocol/php-sdk",
+    "stars": 1627,
+    "desc": "The official PHP SDK for Model Context Protocol servers and clients. Maintained in collaboration wit"
+  },
+  {
+    "repo": "mukul975/cve-mcp-server",
+    "stars": 1624,
+    "desc": "Production-grade MCP server giving Claude 27 security intelligence tools across 21 APIs — CVE lookup"
+  },
+  {
+    "repo": "svnscha/mcp-windbg",
+    "stars": 1614,
+    "desc": "Model Context Protocol for WinDbg."
+  },
+  {
+    "repo": "isaacphi/mcp-language-server",
+    "stars": 1608,
+    "desc": "mcp-language-server gives MCP enabled clients access semantic tools like get definition, references,"
+  },
+  {
+    "repo": "datagouv/datagouv-mcp",
+    "stars": 1601,
+    "desc": "Official data.gouv.fr Model Context Protocol (MCP) server that allows AI chatbots to search, explore"
+  },
+  {
+    "repo": "Flux159/mcp-server-kubernetes",
+    "stars": 1596,
+    "desc": "MCP Server for kubernetes management commands"
+  },
+  {
+    "repo": "nicobailon/pi-mcp-adapter",
+    "stars": 1590,
+    "desc": "Token-efficient MCP adapter for Pi coding agent"
+  },
+  {
+    "repo": "MiniMax-AI/MiniMax-MCP",
+    "stars": 1585,
+    "desc": "Official MiniMax Model Context Protocol (MCP) server that enables interaction with powerful Text to "
+  },
+  {
+    "repo": "qdrant/mcp-server-qdrant",
+    "stars": 1548,
+    "desc": "An official Qdrant Model Context Protocol (MCP) server implementation"
+  },
+  {
+    "repo": "hashicorp/terraform-mcp-server",
+    "stars": 1548,
+    "desc": "The Terraform MCP Server provides seamless integration with Terraform ecosystem, enabling advanced a"
+  },
+  {
+    "repo": "elevenlabs/elevenlabs-mcp",
+    "stars": 1536,
+    "desc": "The official ElevenLabs MCP server"
+  },
+  {
+    "repo": "anaisbetts/mcp-installer",
+    "stars": 1531,
+    "desc": "An MCP server that installs other MCP servers for you"
+  },
+  {
+    "repo": "nickclyde/duckduckgo-mcp-server",
+    "stars": 1531,
+    "desc": "A Model Context Protocol (MCP) server that provides web search capabilities through DuckDuckGo, with"
+  },
+  {
+    "repo": "modelcontextprotocol/swift-sdk",
+    "stars": 1510,
+    "desc": "The official Swift SDK for Model Context Protocol servers and clients."
+  },
+  {
+    "repo": "brave/brave-search-mcp-server",
+    "stars": 1497,
+    "desc": ""
+  },
+  {
+    "repo": "robotmcp/ros-mcp-server",
+    "stars": 1493,
+    "desc": "Connect AI models like Claude & GPT with robots using MCP and ROS."
+  },
+  {
+    "repo": "lgazo/drawio-mcp-server",
+    "stars": 1482,
+    "desc": "Draw.io Model Context Protocol (MCP) Server"
+  },
+  {
+    "repo": "modelcontextprotocol/kotlin-sdk",
+    "stars": 1468,
+    "desc": "The official Kotlin SDK for Model Context Protocol servers and clients. Maintained in collaboration "
+  },
+  {
+    "repo": "DaxianLee/cocos-mcp-server",
+    "stars": 1449,
+    "desc": "一款全面的、便捷的cocos creator AI MCP服务插件，适用于3.8.0以上cocos版本，一键安装，一键启动。A comprehensive and convenient cocos c"
+  },
+  {
+    "repo": "designcomputer/mysql_mcp_server",
+    "stars": 1397,
+    "desc": "A Model Context Protocol (MCP) server that enables secure interaction with MySQL databases"
+  },
+  {
+    "repo": "kimsungwhee/apple-docs-mcp",
+    "stars": 1384,
+    "desc": "MCP server for Apple Developer Documentation - Search iOS/macOS/SwiftUI/UIKit docs, WWDC videos, Swi"
+  },
+  {
+    "repo": "caol64/wenyan-mcp",
+    "stars": 1340,
+    "desc": "文颜 MCP Server 可以让 AI 自动将 Markdown 文章排版后发布至微信公众号。"
+  },
+  {
+    "repo": "datalayer/jupyter-mcp-server",
+    "stars": 1302,
+    "desc": "🪐 🔧 Model Context Protocol (MCP) Server for Jupyter."
+  },
+  {
+    "repo": "pipeboard-co/meta-ads-mcp",
+    "stars": 1302,
+    "desc": "Meta Ads (Facebook/Instagram) MCP server for Claude, ChatGPT, Perplexity & Cursor — the Meta node of"
+  },
+  {
+    "repo": "ihor-sokoliuk/mcp-searxng",
+    "stars": 1299,
+    "desc": "Private web search for AI assistants via SearXNG — supports Claude, Cursor, and any MCP client"
+  },
+  {
+    "repo": "mcpjungle/MCPJungle",
+    "stars": 1294,
+    "desc": "One place to manage & connect to all your MCP servers"
+  },
+  {
+    "repo": "atlassian/atlassian-mcp-server",
+    "stars": 1091,
+    "desc": "Official remote MCP server for Atlassian. Securely connect Jira, Confluence, Jira Service Management"
+  },
+  {
+    "repo": "ArcadeAI/arcade-mcp",
+    "stars": 1049,
+    "desc": "MCP Server Framework and Tool Development library for building custom capabilities into agents. "
+  },
+  {
+    "repo": "apify/mcpc",
+    "stars": 1028,
+    "desc": "The most compatible MCP CLI client. Supports: tools, resources, prompts, completions, async tasks, s"
+  }
+]

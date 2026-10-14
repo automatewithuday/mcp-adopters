@@ -68,18 +68,23 @@ export function qualify(p: Profile): { qualified: boolean; score: number; compan
   return { qualified: true, score: Math.min(100, score), company_norm };
 }
 
-import { OWNER_ALIASES } from "../repos.ts";
+import { OWNER_ALIASES, SEED_REPOS } from "../repos.ts";
+import { BUILD_EVENTS } from "./clickhouse.ts";
 export const alnum = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
 /**
  * Works for the vendor that ships a repo they actively contributed to (fork/issue/PR), judged by the
  * company field or an "at <owner>" / "@<owner>" phrase in the bio. Sellers of MCP, not buyers.
+ * Only seed (vendor) repos count: pushing to your employer's MCP server is the buyer signal, never a maintainer flag.
  */
+const SEED = new Set(SEED_REPOS.map((r) => r.toLowerCase()));
+const PASSIVE = new Set(["WatchEvent", ...BUILD_EVENTS]);
 export function isMaintainer(p: { company: string | null; bio: string | null; repos: string[]; signals: string[] }): boolean {
-  if (!p.signals.some((s) => s !== "WatchEvent")) return false;
+  if (!p.signals.some((s) => !PASSIVE.has(s))) return false;
   const company = alnum(p.company ?? "");
   const bioAt = [...(p.bio ?? "").matchAll(/(?:\bat|@)\s*([A-Za-z0-9][A-Za-z0-9 .-]{1,30})/g)].map((m) => alnum(m[1]));
   for (const repo of p.repos) {
+    if (!SEED.has(repo.toLowerCase())) continue;
     const owner = repo.split("/")[0].toLowerCase();
     const names = OWNER_ALIASES[owner] ?? [owner];
     if (names.some((n) => (company && (company === n || company.startsWith(n))) || bioAt.some((b) => b === n || b.startsWith(n)))) return true;
