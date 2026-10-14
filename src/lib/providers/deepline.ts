@@ -8,6 +8,7 @@ const PRICE: Record<string, number> = {
   findymail_find_from_business_profile: 0.028,
   peopledatalabs_enrich_contact: 0.2,
   harvestapi_get_company: 0.003,
+  findymail_get_company_information: 0.028,
   harvestapi_get_profile_posts: 0.003,
   harvestapi_get_profile_comments: 0.003,
   harvestapi_get_profile_reactions: 0.003,
@@ -53,13 +54,22 @@ export const deepline: EnrichProvider = {
   emailFromLinkedin: (p, scope) => call("findymail_find_from_business_profile", { linkedin_url: p.linkedin }, scope),
   enrichPerson: (p, scope) => call("peopledatalabs_enrich_contact", p.email ? { email: p.email } : { profile: p.profile }, scope),
 
-  // LinkedIn company page by name search ($0.003). Search can return the wrong company: the caller verifies name/domain.
+  // Company domain → LinkedIn company URL ($0.028 per hit, misses are free).
+  companyLinkedin: async (p, scope) => {
+    const tool = "findymail_get_company_information";
+    const { key, raw, usd } = await exec(tool, { domain: p.domain }, scope);
+    const values: Firmographics = { name: raw.name ?? null, domain: raw.domain ?? null, linkedin: raw.linkedin_url ?? null };
+    const ok = !!values.linkedin;
+    return { ok, usd: usd(ok), tool, key, values };
+  },
+
+  // LinkedIn company page ($0.003): by URL when we have one, else name search, which can return the wrong company (caller verifies).
   companyFirmographics: async (p, scope) => {
     const tool = "harvestapi_get_company";
     const search = (p.name ?? p.domain ?? "").trim();
     // HarvestAPI 422s on an empty search; don't spend a call on it
-    if (!search) return { ok: false, usd: 0, tool, key: `${scope}:${tool}:empty`, values: {} };
-    const { key, raw, usd } = await exec(tool, { search }, scope);
+    if (!p.linkedin && !search) return { ok: false, usd: 0, tool, key: `${scope}:${tool}:empty`, values: {} };
+    const { key, raw, usd } = await exec(tool, p.linkedin ? { url: p.linkedin } : { search }, scope);
     const el = raw.element ?? {};
     const locs: any[] = Array.isArray(el.locations) ? el.locations : [];
     const hq = locs.find((l) => l?.headquarter) ?? locs[0];

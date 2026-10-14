@@ -213,10 +213,12 @@ export type CompanyRef = { key: string; name: string | null; domain: string | nu
 /**
  * Companies behind qualified, non-maintainer people ranked ≥ minRank that have no verdict yet (all of them with `force`).
  * Unranked people don't count: run `rank` first. The rank gate keeps the paid lookup off the long tail.
+ * Domain-less companies are skipped: 0 fits in 774 name-only checks (2026-10-14), they are unresolvable by name.
  */
 export async function icpCandidates(force = false, minRank = 0): Promise<CompanyRef[]> {
   const data = await all((a, b) => db.from("people").select("company_key,company_norm,company_domain")
-    .eq("qualified", true).or("maintainer.is.null,maintainer.eq.false").not("company_key", "is", null).gte("rank", minRank).order("login").range(a, b));
+    .eq("qualified", true).or("maintainer.is.null,maintainer.eq.false").not("company_key", "is", null).not("company_domain", "is", null)
+    .gte("rank", minRank).order("login").range(a, b));
   const byKey = new Map<string, CompanyRef>();
   for (const r of data) {
     const c = byKey.get(r.company_key) ?? { key: r.company_key, name: null, domain: null };
@@ -231,28 +233,52 @@ export async function icpCandidates(force = false, minRank = 0): Promise<Company
   return [...byKey.values()];
 }
 
-/**
- * One company: provider lookup → verify it's the right company → ICP verdict → companies row, then
- * people.icp_fit for everyone at that company. A verified LinkedIn website also fills missing company_domain.
- * Unknown stays null (held, not dropped). Nothing is written when the run is already at the cap.
- */
-export async function icpStep({ key, name, domain, runId, maxUsd, icp }: CompanyRef & { runId: string; maxUsd: number; icp: Icp }) {
-  const L = ledger(runId, key, maxUsd);
-  let v: Firmographics | null = null, failure: string | null = null;
-  try {
-    v = await L.paid((scope) => provider.companyFirmographics({ name, domain }, scope));
-  } catch (e) {
-    // one bad lookup (e.g. provider 422 on odd search text) must not abort the batch; recorded, re-tried with --force
-    failure = `error: ${(e as Error).message}`.slice(0, 200);
-  }
-  if (!v && !failure && (await L.skippedForCap())) return { key, fit: null as boolean | null, reason: "skipped_cap" };
+/** Companies already checked by name that stayed unknown and have a domain: the domain fallback's queue. */
+export async function icpUnknowns(): Promise<CompanyRef[]> {
+  const rows = await all((a, b) => db.from("companies").select("key,name,domain").is("icp_fit", null).not("domain", "is", null)
+    .not("checked_at", "is", null).not("icp_reason", "like", "error:%").not("icp_reason", "like", "%via domain%").order("key").range(a, b));
+  return rows as CompanyRef[];
+}
 
-  let fit: boolean | null = null, reason = failure ?? "not found";
-  let row: Record<string, unknown> = { key, name, domain, icp_fit: null, icp_reason: reason, source: L.tools.at(-1) ?? null, checked_at: new Date().toISOString() };
-  if (v) {
-    const got = { ...v, domain: domainOf(v.domain) };
-    const verified = verifiedCompany(got, { name, domain });
+/**
+ * One company: name search → verify it's the right company; if that fails and we have a domain, domain → company
+ * LinkedIn URL → exact page (accepted as-is: the URL came from our own domain). Then ICP verdict → companies row,
+ * then people.icp_fit for everyone at that company. A verified LinkedIn website also fills missing company_domain.
+ * Unknown stays null (held, not dropped). Nothing is written when the run is already at the cap.
+ * `fallbackOnly` skips the name search for companies it already failed on.
+ */
+export async function icpStep({ key, name, domain, runId, maxUsd, icp, fallbackOnly = false }: CompanyRef & { runId: string; maxUsd: number; icp: Icp; fallbackOnly?: boolean }) {
+  const L = ledger(runId, key, maxUsd);
+  let failure: string | null = null;
+  const lookup = async <T>(fn: (scope: string) => Promise<Hit<T>>): Promise<T | null> => {
+    try { return await L.paid(fn); }
+    catch (e) {
+      // one bad lookup (e.g. provider 422 on odd search text) must not abort the batch; recorded, re-tried next run
+      failure = `error: ${(e as Error).message}`.slice(0, 200);
+      return null;
+    }
+  };
+  const norm = (f: Firmographics) => ({ ...f, domain: domainOf(f.domain) });
+
+  let got: Firmographics | null = null, verified = false, via = "";
+  if (!fallbackOnly) {
+    const v = await lookup((scope) => provider.companyFirmographics({ name, domain }, scope));
+    if (v) { got = norm(v); verified = verifiedCompany(got, { name, domain }); }
+  }
+  if (!verified && domain && !failure) {
+    const li = await lookup((scope) => provider.companyLinkedin({ domain }, scope));
+    if (li?.linkedin) {
+      const v = await lookup((scope) => provider.companyFirmographics({ name, domain, linkedin: li.linkedin }, scope));
+      if (v) { got = norm(v); verified = true; via = " (via domain)"; }
+    }
+  }
+  if (!got && !failure && (await L.skippedForCap())) return { key, fit: null as boolean | null, reason: "skipped_cap" };
+
+  let fit: boolean | null = null, reason = failure ?? `not found${domain ? " (via domain)" : ""}`;
+  let row: Record<string, unknown> = { key, name, domain, icp_fit: null, icp_reason: reason, source: L.tools.join(">") || null, checked_at: new Date().toISOString() };
+  if (got) {
     ({ fit, reason } = verified ? icpFit(got, icp) : { fit: null, reason: `company mismatch: got "${got.name ?? ""}" ${got.domain ?? ""}` });
+    reason += via;
     // keep our own name/domain on a mismatch; the returned company is in icp_reason
     row = { ...row, name: verified ? got.name ?? name : name, domain: domain ?? (verified ? got.domain : null), linkedin: verified ? got.linkedin : null,
       employees: got.employees, employees_min: got.employees_min, employees_max: got.employees_max,

@@ -26,11 +26,11 @@ export const companyKey = (company_norm: string | null, domain: string | null): 
 
 /**
  * Did the provider return the company we asked about? LinkedIn name search can land on a namesake.
- * Accept a domain match, or an exact normalised-name match when we had no domain to check against.
+ * Accept a domain match; when either side has no domain, an exact normalised-name match (pages often list no website).
  */
 export function verifiedCompany(f: Firmographics, want: { name: string | null; domain: string | null }): boolean {
   const got = domainOf(f.domain);
-  if (want.domain) return !!got && got === want.domain;
+  if (want.domain && got) return got === want.domain;
   return !!want.name && !!f.name && !!bareName(want.name) && bareName(f.name) === bareName(want.name);
 }
 

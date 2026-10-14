@@ -4,7 +4,8 @@
 //   npx tsx scripts/run.ts rank    [--limit 200] [--force]    # TypeSafe judgments + rank for qualified people
 //   npx tsx scripts/run.ts enrich  --run-id review --max-usd 0 --min-rank 40 --limit 50
 //   npx tsx scripts/run.ts reprofile            # re-run profiles+rules for everyone already profiled
-//   npx tsx scripts/run.ts icp     --icp ~/path/client-profile.yaml --run-id icp1 --max-usd 1 --min-rank 40 [--force]
+//   npx tsx scripts/run.ts icp     --icp ~/path/client-profile.yaml --run-id icp1 --max-usd 1 --min-rank 40 [--force] [--limit N]
+//   npx tsx scripts/run.ts icp     --icp <yaml> --run-id icp2 --max-usd 5 --unknowns   # domain fallback on companies name search missed
 //   npx tsx scripts/run.ts activity --run-id act1 --max-usd 1 --min-rank 40 --limit 50 [--icp <yaml>]
 //   npx tsx scripts/run.ts report
 import { parseArgs } from "node:util";
@@ -16,7 +17,7 @@ if (!process.env.GITHUB_TOKEN) process.env.GITHUB_TOKEN = execSync("gh auth toke
 
 const { db, all } = await import("../src/lib/db.ts");
 const { searchRepos } = await import("../src/lib/discover.ts");
-const { chunk, fetchActorsStep, fetchProfilesStep, rankStep, enrichCandidates, enrichPersonStep, icpCandidates, icpStep, activityCandidates, activityStep } = await import("../src/lib/pipeline.ts");
+const { chunk, fetchActorsStep, fetchProfilesStep, rankStep, enrichCandidates, enrichPersonStep, icpCandidates, icpUnknowns, icpStep, activityCandidates, activityStep } = await import("../src/lib/pipeline.ts");
 const { loadIcp } = await import("../src/lib/icp.ts");
 const { SEED_REPOS } = await import("../src/repos.ts");
 
@@ -25,7 +26,7 @@ const { positionals, values } = parseArgs({
   options: {
     days: { type: "string", default: "365" }, limit: { type: "string" }, repos: { type: "string" },
     source: { type: "string", default: "repos" }, "min-stars": { type: "string", default: "1000" },
-    force: { type: "boolean", default: false },
+    force: { type: "boolean", default: false }, unknowns: { type: "boolean", default: false },
     "run-id": { type: "string", default: "local" }, "max-usd": { type: "string", default: "0" }, "min-rank": { type: "string", default: "40" },
     icp: { type: "string", default: process.env.ICP_PROFILE }, // client-profile.yaml; when given, enrich/activity only take icp_fit = true
   },
@@ -81,12 +82,13 @@ if (cmd === "discover") {
   if (!icpPath) { console.error("icp needs --icp <client-profile.yaml> (or ICP_PROFILE)"); process.exit(1); }
   const icp = loadIcp(icpPath);
   console.log("ICP:", JSON.stringify(icp));
-  const companies = await icpCandidates(values.force, Number(values["min-rank"]));
-  console.log(`companies to check: ${companies.length}`);
+  let companies = values.unknowns ? await icpUnknowns() : await icpCandidates(values.force, Number(values["min-rank"]));
+  if (values.limit) companies = companies.slice(0, Number(values.limit));
+  console.log(`companies to check: ${companies.length}${values.unknowns ? " (domain fallback only)" : ""}`);
   const tally: Record<string, number> = {};
   // ponytail: 4 lookups in flight; the cap check is read-then-write, so a run can overshoot --max-usd by at most 3 lookups (~$0.01)
   for (const batch of chunk(companies, 4)) {
-    const rs = await Promise.all(batch.map((c) => icpStep({ ...c, runId: values["run-id"]!, maxUsd: Number(values["max-usd"]), icp })));
+    const rs = await Promise.all(batch.map((c) => icpStep({ ...c, runId: values["run-id"]!, maxUsd: Number(values["max-usd"]), icp, fallbackOnly: values.unknowns })));
     rs.forEach((r, i) => {
       const label = r.reason === "skipped_cap" ? "skipped_cap" : String(r.fit);
       tally[label] = (tally[label] ?? 0) + 1;

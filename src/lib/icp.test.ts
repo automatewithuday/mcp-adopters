@@ -48,6 +48,9 @@ test("verifiedCompany: domain wins, name only when no domain was known", () => {
   assert.equal(verifiedCompany({ name: "Cinnamon Inc.", domain: null }, { name: "Cinnamon", domain: null }), true);
   assert.equal(verifiedCompany({ name: "Inc.", domain: null }, { name: "Inc", domain: null }), false);
   assert.equal(verifiedCompany({ name: "Acme" }, { name: null, domain: null }), false);
+  // page lists no website: fall back to the name
+  assert.equal(verifiedCompany({ name: "Agency Handy", domain: null }, { name: "Agencyhandy", domain: "agencyhandy.com" }), true);
+  assert.equal(verifiedCompany({ name: "ACE Advising & Consulting", domain: null }, { name: "Aceadvising", domain: "aceadvising.com" }), false);
 });
 
 test("companyKey: normalised name, else domain", () => {

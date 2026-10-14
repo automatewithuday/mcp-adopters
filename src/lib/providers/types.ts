@@ -50,8 +50,13 @@ export interface EnrichProvider {
   emailFromLinkedin(p: { linkedin: string }, scope: string): Promise<Hit>;
   /** Title, company, domain, LinkedIn and email from an email address or a social profile URL (e.g. a GitHub URL). */
   enrichPerson(p: { email?: string; profile?: string }, scope: string): Promise<Hit>;
-  /** Headcount and HQ country for a company, by name and/or domain. The caller verifies it is the right company. */
-  companyFirmographics(p: { name: string | null; domain: string | null }, scope: string): Promise<Hit<Firmographics>>;
+  /**
+   * Headcount and HQ country for a company. With `linkedin` the exact company page is read; otherwise a name/domain
+   * search, which the caller verifies (search can land on a namesake).
+   */
+  companyFirmographics(p: { name: string | null; domain: string | null; linkedin?: string | null }, scope: string): Promise<Hit<Firmographics>>;
+  /** Company LinkedIn URL (and name) from a web domain. The fallback when name search fails. */
+  companyLinkedin(p: { domain: string }, scope: string): Promise<Hit<Firmographics>>;
   /** Recent posts, comments and reactions for a LinkedIn profile URL. ok=false when the profile can't be read. */
   linkedinActivity(p: { linkedin: string }, scope: string): Promise<Hit<Activity>>;
 }
