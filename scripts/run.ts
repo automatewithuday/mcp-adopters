@@ -116,14 +116,14 @@ if (cmd === "discover") {
   console.log(`spend for run ${values["run-id"]}: $${Number(data).toFixed(3)}`);
 } else if (cmd === "report") {
   const n = async (q: any) => (await q).count ?? 0;
-  const all = await n(db.from("people").select("*", { count: "exact", head: true }));
+  const total = await n(db.from("people").select("*", { count: "exact", head: true }));
   const fetched = await n(db.from("people").select("*", { count: "exact", head: true }).not("fetched_at", "is", null));
   const qualified = await n(db.from("people").select("*", { count: "exact", head: true }).eq("qualified", true));
   const withEmail = await n(db.from("people").select("*", { count: "exact", head: true }).not("github_email", "is", null));
   const withLinkedin = await n(db.from("people").select("*", { count: "exact", head: true }).not("linkedin", "is", null));
   const contacts = await n(db.from("contacts").select("*", { count: "exact", head: true }));
   const contactsEmail = await n(db.from("contacts").select("*", { count: "exact", head: true }).not("email", "is", null));
-  console.table({ people: all, profiled: fetched, qualified, github_email: withEmail, linkedin: withLinkedin, contacts, contacts_with_email: contactsEmail });
+  console.table({ people: total, profiled: fetched, qualified, github_email: withEmail, linkedin: withLinkedin, contacts, contacts_with_email: contactsEmail });
   // ICP verdicts per company, and the channel a rep would use per person
   type Pg<T> = PromiseLike<{ data: T[] | null; error: { message: string } | null }>;
   type CoRow = { icp_fit: boolean | null; icp_reason: string | null };
