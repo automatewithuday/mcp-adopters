@@ -58,13 +58,44 @@ Figma, AWS, Google, FastMCP, and mcp-go), last 60 days, first 300 profiles.
 | name + domain → email, 1 call | $0.01 |
 | **total** | **$2.81** |
 
-The ledger in Supabase matched the provider's balance change to the cent. Scaling the same funnel to a
-full year of activity on the same repos is roughly 17,000 actors, 5,000 qualified, and a paid pass you
-cap wherever you like; the expensive step is ~$0.20 per person who reaches it.
+The ledger in Supabase matched the provider's balance change to the cent. The expensive step is ~$0.20
+per person who reaches it. For what a full year looks like, see the next section.
 
 What the ranked list looked like at the top: a staff engineer at an ed-tech company who forked two MCP
 repos and sent a PR, engineers at Apple, Netflix, NVIDIA, Dell, Cloudflare, and Fidelity who filed
 issues or PRs, and the CEO of a company that ships an MCP framework (flagged as a vendor, skipped).
+
+## The full run: twelve months, 164 repos
+
+Same pipeline, wider net. `discover` grew the seed list to 164 MCP repos, the fetch covered twelve months
+(14 Oct 2025 to 14 Oct 2026), and the `builders` source added people who push, create or release on an
+MCP-named repo someone else owns. Counts are from the Supabase tables on 18 Oct 2026.
+
+| stage | count |
+|---|---|
+| people found | 104,121 |
+| of those, committed to an MCP repo (builders) | 27,333 |
+| passed the rules | 30,973 |
+| vendor employees among them (skipped) | 350 |
+| rank ≥ 70 | 5,169 |
+| companies looked up for the ICP gate | 3,994 |
+| in ICP (headcount band, HQ in US or Canada) | 315 |
+| out of ICP | 1,702 |
+| couldn't tell (held, not dropped) | 1,977 |
+| rank ≥ 70 people at an in-ICP company, vendors excluded | 499 |
+
+Who made rank ≥ 70: 3,000 engineers, 1,316 founders or execs, 607 engineering leaders, 199 people in
+security roles, 45 product or other.
+
+| cost item | amount |
+|---|---|
+| GitHub, GH Archive mirror | $0 |
+| AI ranking, 30,974 people | about $1 (estimate, not in the ledger: ~800 tokens a person at $0.042 per million) |
+| company lookups for the ICP gate, 3,981 calls | $12.22 |
+| **total** | **about $13** |
+
+Paid enrichment hasn't run on the 499 yet. At the pilot's rate of about $0.20 per person who reaches
+that step, all 499 would be about $100, and `--max-usd` stops the run wherever you set it.
 
 ## What you need
 
